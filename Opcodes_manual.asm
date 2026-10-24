@@ -1434,4 +1434,18 @@ CR_CR4               EQU 4       ; CR4 - Architectural Extensions (VMXE authoriz
 // Aligns RSP down to a clean 16-byte boundary using a fast, non-destructive bitwise immediate AND block.
 #define OPCODE_ALIGN_STACK   0x83E4F0    // AND RSP, -16 - Enforces strict 16-byte structural stack alignment [0x83 /4]
 
+// =================================================================
+// SECTION 14: MEMORY EXECUTION PROTECTION
+// =================================================================
 
+// --- Hardware Pipeline Cache Synchronization (Intel & AMD Cross-Compatible) ---
+// ARCHITECTURE NOTE: Essential after code injection. When the AI writes raw opcodes into RAM, 
+// the CPU might still hold stale prefetch instructions inside the L1 Instruction Cache (I-Cache). 
+// These commands force a hardware cache synchronization, ensuring the decoder reads the fresh opcodes.
+
+// Serializes entire processor engine states. Forces the execution pipeline to drain, completely 
+// clearing out the instruction prefetch queues to reload the newly injected machine bytes from RAM.
+#define OPCODE_SERIALIZE     0x0F01E8    // SERIALIZE   - Modern Intel/AMD Cross-Compatible Pipeline flusher
+
+// Invalidates and flushes the microprocessor instruction cache pipelines. Ensures high-speed JIT consistency.
+#define OPCODE_CLDEMOTE      0x0F1C      // CLDEMOTE    - Cache Line Demote (Requires ModR/M extension /0)
