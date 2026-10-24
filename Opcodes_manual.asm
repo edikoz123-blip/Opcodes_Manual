@@ -523,7 +523,7 @@ CR_CR4               EQU 4       ; CR4 - Architectural Extensions (VMXE authoriz
 #define CR_CR4_SHADOW        4       // CR4_SHADOW - Hypervisor Feature Filter: Mirrors authorized Guest CR4 properties, allowing virtual kernels to audit feature states safely without triggering VMM exits.
 
 // =================================================================
-// SECTION 11: UNDOCUMENTED, HIDDEN & EXCEPTION OPCODES (SILICON ZERO-DAY)
+// SECTION 11: UNDOCUMENTED, HIDDEN & EXCEPTION OPCODES 
 // =================================================================
 
 // [Intel & AMD Cross-Compatible]
