@@ -861,7 +861,7 @@ CR_CR4               EQU 4       ; CR4 - Architectural Extensions (VMXE authoriz
 // Loads an aggressive memory read barrier (Load Fence). Serializes all load operations across the local core, 
 // forcing every subsequent read request to stall until all prior memory extractions have completed and committed. 
 // Vital for syncing multi-threaded model pipelines safely.
-#define OPCODE_LFENCE        0x0F0AE8 // LFENCE - Load Fence (Serializes read operations)
+#define OPCODE_LFENCE        0x0FAAE8 // LFENCE - Load Fence (Serializes read operations)
 
 // [Intel & AMD Cross-Compatible]
 // Loads a universal memory barrier (Memory Fence). Serializes both read and write operations across the memory pipeline, 
@@ -890,11 +890,11 @@ CR_CR4               EQU 4       ; CR4 - Architectural Extensions (VMXE authoriz
 
 // Loads a strict memory write barrier (Store Fence). Serializes all store operations across the execution unit, 
 // forcing subsequent writes to stall until all prior memory writes have been safely flushed to the cache hierarchy.
-#define OPCODE_SFENCE        0x0F0AE8    // SFENCE      - Store Fence (Serializes write operations; requires ModR/M extension)
+#define OPCODE_SFENCE        0x0FAAF8    // SFENCE      - Store Fence (Serializes memory write operations)
 
 // Flushes a specific data cache line from all levels of the processor cache hierarchy based on a linear address.
 // Forces the targeted line to be written back to system RAM if dirty, preventing speculative execution attacks.
-#define OPCODE_CLFLUSH       0x0FAE      // CLFLUSH     - Cache Line Flush (Requires ModR/M extension /7)
+#define OPCODE_CLFLUSH       0x0FAAE7      // CLFLUSH     - Cache Line Flush (Requires ModR/M extension /7)
 
 // --- Descriptor Table Management Operations (Intel & AMD Cross-Compatible) ---
 // ARCHITECTURE NOTE: Complements LGDT/LIDT by allowing the current active structure mappings 
@@ -1449,3 +1449,16 @@ CR_CR4               EQU 4       ; CR4 - Architectural Extensions (VMXE authoriz
 
 // Invalidates and flushes the microprocessor instruction cache pipelines. Ensures high-speed JIT consistency.
 #define OPCODE_CLDEMOTE      0x0F1C      // CLDEMOTE    - Cache Line Demote (Requires ModR/M extension /0)
+
+// --- Hardware Cache Line Management & Memory Fencing ---
+// ARCHITECTURE NOTE: Essential when optimizing JIT execution layouts. While SERIALIZE drains the 
+// pipeline decoder queues, these instructions force the data sub-system to physically commit modified 
+// opcode bytes from dirty cache lines directly into system RAM, bypassing execution stalls.
+
+// [Intel & AMD Cross-Compatible]
+// Optimized, non-ordered version of CLFLUSH for high-throughput multi-threaded memory flushing.
+#define OPCODE_CLFLUSHOPT    0x660FAAE7  // CLFLUSHOPT  - Optimized Cache Line Flush [Intel & AMD Cross-Compatible] (Requires Prefix 66h)
+
+// [Intel & AMD Cross-Compatible]
+// Writes back modified cache lines to system memory without invalidating the line from the processor caches.
+#define OPCODE_CLWB          0x660FAAE6  // CLWB        - Cache Line Write Back [Intel & AMD Cross-Compatible] (Requires ModR/M extension /6)
